@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Universo Simétrico para Katerin 💜</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #02000c;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            cursor: grab;
+        }
+
+        body:active {
+            cursor: grabbing;
+        }
+
+        /* --- INTERFAZ DEL UNIVERSO --- */
+        #interface {
+            position: absolute;
+            width: 100%;
+            bottom: 5%;
+            text-align: center;
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0; 
+            transition: opacity 2s ease-in-out;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            letter-spacing: 12px;
+            text-shadow: 0 0 20px #9d4edd;
+            margin: 0;
+        }
+
+        #tiempo {
+            font-size: 1rem;
+            color: #ff99ff;
+            margin-top: 5px;
+            font-weight: 300;
+        }
+
+        .burbuja-imagen {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 0 20px rgba(255, 153, 255, 0.8);
+            cursor: pointer;
+            overflow: hidden;
+            background: #fff;
+            opacity: 0; 
+            transition: transform 0.2s ease, border-color 0.2s, box-shadow 0.2s, opacity 1.5s ease-out;
+            pointer-events: none; 
+        }
+
+        .burbuja-imagen img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .burbuja-imagen:hover {
+            transform: scale(1.2) !important;
+            border-color: #ff99ff;
+            box-shadow: 0 0 40px #ff99ff;
+            z-index: 1000 !important;
+        }
+
+        .burbuja-texto {
+            position: absolute;
+            width: 140px;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 0px 0px 8px #000, 0px 0px 4px #000;
+            pointer-events: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0;
+            transition: opacity 1.5s ease-out;
+        }
+
+        /* --- CUADRO MODAL --- */
+        #modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(15, 5, 30, 0.98);
+            border: 2px solid #ff99ff;
+            border-radius: 25px;
+            padding: 25px;
+            text-align: center;
+            z-index: 2000;
+            width: 320px;
+            max-width: 85vw;
+            box-shadow: 0 0 100px #7b2cbf;
+            box-sizing: border-box;
+        }
+
+        #modal img {
+            width: 100%;
+            height: auto;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border: 2px solid #fff;
+        }
+
+        #modal-texto {
+            font-size: 1.05rem;
+            line-height: 1.5;
+            color: #f0f0f0;
+            margin-bottom: 25px;
+            text-align: left;
+            min-height: 70px;
+            white-space: normal;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        #modal button {
+            background: #9d4edd;
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1500;
+        }
+
+        #instrucciones {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 0.8rem;
+            color: #ff99ff;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+
+        #labels-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        /* --- BOTONES FLOTANTES --- */
+        #music-container {
+            position: absolute;
+            bottom: 25px;
+            left: 25px;
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            background: rgba(20, 10, 35, 0.6);
+            padding: 8px 15px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 153, 255, 0.3);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+
+        #reset-container {
+            position: absolute;
+            bottom: 25px;
+            right: 25px;
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            background: rgba(20, 10, 35, 0.6);
+            padding: 8px 15px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 153, 255, 0.3);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+
+        .btn-flotante {
+            width: 40px;
+            height: 40px;
+            background: #9d4edd;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 0 15px #9d4edd;
+            transition: transform 0.3s;
+            border: none;
+        }
+
+        .btn-flotante:hover {
+            transform: scale(1.1);
+        }
+
+        .btn-flotante svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+
+        .btn-text {
+            font-size: 0.75rem;
+            margin-left: 10px;
+            color: #ff99ff;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        .playing {
+            animation: spin 4s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        #yt-audio-player {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* --- CAPA DE INTRODUCCIÓN OPTIMIZADA --- */
+        #intro-sequence {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: #02000c;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        #intro-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        #bear-container {
+            width: 180px;
+            height: 180px;
+            margin-bottom: 25px;
+            display: block !important;
+            opacity: 0;
+            transform: scale(0.6);
+            transition: opacity 1s ease-out, transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #bear-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        #intro-reveal-btn {
+            background: #ff33aa;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 18px 35px;
+            border-radius: 50px;
+            border: 3px solid #ffffff;
+            box-shadow: 0 0 30px #ff33aa, inset 0 0 15px rgba(255,255,255,0.5);
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            animation: pulseHeart 1.5s infinite ease-in-out;
+        }
+
+        @keyframes pulseHeart {
+            0% { transform: scale(1); box-shadow: 0 0 20px #ff33aa; }
+            50% { transform: scale(1.08); box-shadow: 0 0 40px #ff33aa, 0 0 20px #ff99ff; }
+            100% { transform: scale(1); box-shadow: 0 0 20px #ff33aa; }
+        }
+
+        #intro-dedication-text {
+            margin-top: 25px;
+            font-size: 1.1rem;
+            color: #ff99ff;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255,153,255,0.5);
+            opacity: 0;
+            transition: opacity 1s ease;
+            font-weight: 400;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="instrucciones">🖱️ Arrastra libremente para explorar el cosmos 3D</div>
+
+    <div id="intro-sequence">
+        <div id="intro-content">
+            <div id="bear-container">
+                <img src="oso.gif" alt="Osito Enamorado">
+            </div>
+            
+            <button id="intro-reveal-btn" onclick="revelarEscenaPrincipal()">Click aquí</button>
+            
+            <div id="intro-dedication-text">Feliz Aniversario mi Amor, Felices 6 meses mi Kate ❤️</div>
+        </div>
+    </div>
+
+    <div id="yt-audio-player"></div>
+
+    <div id="music-container">
+        <button id="music-btn" class="btn-flotante" onclick="toggleMúsica()">
+            <svg id="icon-play" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+        </button>
+        <div id="music-title" class="btn-text">Jacarandá Gris 🎵</div>
+    </div>
+
+    <div id="reset-container">
+        <button id="reset-btn" class="btn-flotante" onclick="reiniciarViaje()">
+            <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+        </button>
+        <div class="btn-text">Reiniciar Viaje 🚀</div>
+    </div>
+
+    <div id="interface">
+        <h1>KATERIN</h1>
+        <div id="tiempo">Calculando...</div>
+    </div>
+
+    <div id="overlay" onclick="cerrarModal()"></div>
+    <div id="modal">
+        <img id="modal-img" src="" alt="">
+        <h2 id="modal-titulo" style="color: #ff99ff; margin: 5px 0;"></h2>
+        <p id="modal-texto"></p>
+        <button onclick="cerrarModal()">VOLVER 🚀</button>
+    </div>
+
+    <div id="labels-container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script>
+        // --- CONTROL AUDIO API ---
+        let player;
+        let musicaActiva = false;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('yt-audio-player', {
+                height: '0',
+                width: '0',
+                videoId: 'wJD4xGp1Irg', 
+                playerVars: {
+                    'autoplay': 0,
+                    'controls': 0,
+                    'loop': 1,
+                    'playlist': 'wJD4xGp1Irg'
+                },
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+
+        function onPlayerReady(event) {}
+
+        function toggleMúsica() {
+            if (!player) return;
+            const btn = document.getElementById('music-btn');
+            if (!musicaActiva) {
+                player.playVideo();
+                btn.classList.add('playing');
+                document.getElementById('icon-play').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; 
+                musicaActiva = true;
+            } else {
+                player.pauseVideo();
+                btn.classList.remove('playing');
+                document.getElementById('icon-play').innerHTML = '<path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>'; 
+                musicaActiva = false;
+            }
+        }
+
+        // --- CONTROL DE LA INTRODUCCIÓN ---
+        let introSequenceActive = true;
+        let orbitControlsEnabled = false;
+        let nodesEnabled = false;
+
+        function iniciarSecuenciaIntro() {
+            const bear = document.getElementById('bear-container');
+            if(bear) {
+                bear.style.opacity = "0";
+                bear.style.transform = "scale(0.6)";
+            }
+            document.getElementById('intro-reveal-btn').style.opacity = "0";
+            document.getElementById('intro-reveal-btn').style.transform = "translateY(20px)";
+            document.getElementById('intro-dedication-text').style.opacity = "0";
+
+            setTimeout(() => {
+                if(bear) {
+                    bear.style.opacity = "1";
+                    bear.style.transform = "scale(1)";
+                }
+            }, 300);
+
+            setTimeout(() => {
+                document.getElementById('intro-reveal-btn').style.opacity = "1";
+                document.getElementById('intro-reveal-btn').style.transform = "translateY(0)";
+                document.getElementById('intro-dedication-text').style.opacity = "1";
+            }, 1000);
+        }
+
+        function revelarEscenaPrincipal() {
+            if(player && !musicaActiva) {
+                toggleMúsica();
+            }
+
+            document.getElementById('intro-sequence').style.opacity = '0';
+            
+            setTimeout(() => {
+                document.getElementById('intro-sequence').style.display = 'none';
+                
+                document.getElementById('interface').style.opacity = '1';
+                document.getElementById('music-container').style.opacity = '1'; 
+                document.getElementById('reset-container').style.opacity = '1'; 
+                document.getElementById('instrucciones').style.opacity = '0.7';
+                
+                introSequenceActive = false;
+                orbitControlsEnabled = true;
+                nodesEnabled = true;
+            }, 1500);
+        }
+
+        // --- FUNCIÓN REINICIAR VIAJE ---
+        function reiniciarViaje() {
+            cerrarModal();
+            
+            // Ocultar elementos de la interfaz principal
+            document.getElementById('interface').style.opacity = '0';
+            document.getElementById('music-container').style.opacity = '0';
+            document.getElementById('reset-container').style.opacity = '0';
+            document.getElementById('instrucciones').style.opacity = '0';
+
+            // Ocultar burbujas de golpe
+            nodes.forEach(n => {
+                n.el.style.opacity = "0";
+                n.tEl.style.opacity = "0";
+                n.el.style.pointerEvents = "none";
+            });
+
+            // Volver a mostrar el menú de intro
+            const intro = document.getElementById('intro-sequence');
+            intro.style.display = 'flex';
+            intro.style.opacity = '1';
+
+            // Resetear estados de animación y cámara de Three.js
+            introSequenceActive = true;
+            orbitControlsEnabled = false;
+            nodesEnabled = false;
+            
+            estadoIntro = "TUNEL";
+            tiempoEstado = 0;
+            factorMezclaTunel = 1.0;
+            corazonMat.opacity = 0.0;
+            nucleo.scale.set(0, 0, 0);
+            controls.autoRotate = false;
+
+            // Reposicionar partículas a la estructura del túnel inicial
+            const posGeo = galaxiaGeo.attributes.position.array;
+            let index = 0;
+            for(let i = 0; i < numParticulasGalaxia; i++) {
+                posGeo[index] = posicionesInicialesTunel[index];
+                posGeo[index+1] = posicionesInicialesTunel[index+1];
+                posGeo[index+2] = posicionesInicialesTunel[index+2];
+                index += 3;
+            }
+            galaxiaGeo.attributes.position.needsUpdate = true;
+
+            camera.position.set(0, 0, 180);
+            controls.target.set(0, 0, 0);
+            controls.update();
+
+            // Lanzar animaciones internas de los ositos
+            iniciarSecuenciaIntro();
+        }
+
+        window.addEventListener('DOMContentLoaded', iniciarSecuenciaIntro);
+
+        // --- MOTOR SCENE THREE.JS ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.autoRotate = false;
+        controls.enablePan = false;
+        controls.minPolarAngle = 0;
+        controls.maxPolarAngle = Math.PI;
+
+        let estadoIntro = "TUNEL";
+        let tiempoEstado = 0;
+        let factorMezclaTunel = 1.0; 
+
+        // Estrellas Universales
+        const starGeo = new THREE.BufferGeometry();
+        const starPos = [];
+        for (let i = 0; i < 2000; i++) {
+            starPos.push((Math.random() - 0.5) * 500, (Math.random() - 0.5) * 500, (Math.random() - 0.5) * 500);
+        }
+        starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
+        scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.2 })));
+
+        // Galaxia Espiral
+        const galaxiaGroup = new THREE.Group();
+        const numParticulasGalaxia = 45000;
+        const brazos = 3;
+        const radioGalaxia = 45;
+        
+        const posicionesFinalesGalaxia = [];
+        const posicionesInicialesTunel = []; // Guardamos la forma del túnel original para el reset
+        const coloresGalaxia = [];
+        const colorInterno = new THREE.Color('#ff77ff');
+        const colorExterno = new THREE.Color('#3a0ca3');
+
+        for(let i = 0; i < numParticulasGalaxia; i++) {
+            const factorRadio = Math.pow(Math.random(), 2) * radioGalaxia; 
+            const anguloBrazo = ((i % brazos) / brazos) * Math.PI * 2;
+            const anguloGiro = (factorRadio * 0.18); 
+
+            const aleatorioX = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.4 * factorRadio;
+            const aleatorioY = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.2 * factorRadio;
+            const aleatorioZ = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.4 * factorRadio;
+
+            const xFinal = Math.cos(anguloBrazo + anguloGiro) * factorRadio + aleatorioX;
+            const zFinal = Math.sin(anguloBrazo + anguloGiro) * factorRadio + aleatorioZ;
+            const yFinal = aleatorioY;
+            posicionesFinalesGalaxia.push(xFinal, yFinal, zFinal);
+
+            const anguloTunel = Math.random() * Math.PI * 2;
+            const radioTunel = 2 + Math.random() * 25;
+            const largoTunel = (Math.random() - 0.5) * 350; 
+            
+            posicionesInicialesTunel.push(
+                Math.cos(anguloTunel) * radioTunel,
+                Math.sin(anguloTunel) * radioTunel,
+                largoTunel
+            );
+
+            const colorMezcla = colorInterno.clone();
+            colorMezcla.lerp(colorExterno, factorRadio / radioGalaxia);
+            coloresGalaxia.push(colorMezcla.r, colorMezcla.g, colorMezcla.b);
+        }
+
+        const galaxiaGeo = new THREE.BufferGeometry();
+        // Hacemos una copia profunda inicial para la posición actual
+        galaxiaGeo.setAttribute('position', new THREE.Float32BufferAttribute([...posicionesInicialesTunel], 3));
+        galaxiaGeo.setAttribute('color', new THREE.Float32BufferAttribute(coloresGalaxia, 3));
+
+        const galaxiaMat = new THREE.PointsMaterial({
+            size: 0.15,
+            vertexColors: true,
+            blending: THREE.AdditiveBlending,
+            transparent: true,
+            opacity: 0.9
+        });
+
+        const polvoGalactico = new THREE.Points(galaxiaGeo, galaxiaMat);
+        galaxiaGroup.add(polvoGalactico);
+
+        const nucleoGeo = new THREE.SphereGeometry(1.5, 32, 32);
+        const nucleoMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const nucleo = new THREE.Mesh(nucleoGeo, nucleoMat);
+        nucleo.scale.set(0,0,0);
+        galaxiaGroup.add(nucleo);
+        
+        scene.add(galaxiaGroup);
+
+        // Corazón Cósmico
+        const corazonGroup = new THREE.Group();
+        const posicionesCorazon = [];
+        const numParticulasCorazon = 20000;
+
+        for (let i = 0; i < numParticulasCorazon; i++) {
+            const t = Math.random() * Math.PI * 2;
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+            
+            const dispersiónX = (Math.random() - 0.5) * 3;
+            const dispersiónY = (Math.random() - 0.5) * 3;
+            const dispersiónZ = (Math.random() - 0.5) * 6;
+
+            posicionesCorazon.push(x * 0.38 + dispersiónX, y * 0.38 + dispersiónY, dispersiónZ);
+        }
+
+        const corazonGeo = new THREE.BufferGeometry();
+        corazonGeo.setAttribute('position', new THREE.Float32BufferAttribute(posicionesCorazon, 3));
+        
+        const corazonMat = new THREE.PointsMaterial({ 
+            color: 0xff33aa, 
+            size: 0.15, 
+            blending: THREE.AdditiveBlending,
+            transparent: true,
+            opacity: 0.0
+        });
+        
+        const nebulosaCorazon = new THREE.Points(corazonGeo, corazonMat);
+        corazonGroup.add(nebulosaCorazon);
+        corazonGroup.position.set(0, 10, 0); 
+        scene.add(corazonGroup);
+
+        // Estructura de Datos
+        const info = [
+            { t: "Zoro", m: "Mi Katerin, aunque mi sentido de la orientación sea nulo, mi corazón nunca se pierde si tú eres mi destino.", img: "https://i.pinimg.com/originals/f6/e3/60/f6e3608a550bfb051f3942464eb1f588.png" },
+            { t: "Luffy", m: "¡Katerin! He recorrido mares enteros buscando el tesoro más grande... ¡Tú eres mi One Piece y mi reina pirata!", img: "https://i.redd.it/wusvli4lv8271.png" },
+            { t: "Sanji", m: "Mi queridísima Katerin, cada platillo que cocino es pensando en ti. ¡Melorine, melorine!", img: "https://mystickermania.com/cdn/stickers/anime/one-piece-sanji-fall-in-love-512x512.png" },
+            { t: "Bakugo", m: "¡Escucha bien, Katerin! Eres la única persona que no me hace explotar de rabia... eres lo más importante.", img: "https://dylanharford.bcfe.ie/wp-content/uploads/2021/04/T_ui_Ch002_CharaImage-870x580.png" },
+            { t: "Legolas", m: "Katerin, mis ojos de elfo pueden ver a leguas, pero lo más bello que han visto es tu alma.", img: "https://images.fineartamerica.com/images/artworkimages/medium/3/hobbit-legolas-greenleaf-handsley-nguyen-transparent.png" },
+            { t: "Will Byers", m: "Katerin, incluso cuando estuve perdido en el 'Upside Down', la esperanza de volver a verte fue mi luz.", img: "https://pbs.twimg.com/profile_images/2006450346701266944/Qdjva46Z.png" },
+            { t: "Yeo Tae-joo", m: "Katerin, eres tan adictiva como el mejor manhwa. Quiero ser el protagonista de tu vida, siempre.", img: "https://i.pinimg.com/736x/06/dd/98/06dd9818aefc0b46f8f69c71cd1b5e19.jpg" },
+            { t: "Seram Marita", m: "Mi Katerin, eres la magia más pura que he conocido. Iluminas mi mundo como el sol.", img: "https://i.pinimg.com/736x/74/3d/d7/743dd71080785a3cb9e86ba7de0247b4.jpg" },
+            { t: "Finn y Jake", m: "¡Katerin! ¡Es hora de aventura contigo! ¡Eres la princesa de mi corazón!", img: "https://largahistoria.wordpress.com/wp-content/uploads/2012/10/jake_the_dog_and_finn_the_human_by_pokercake-d4nzom_large.png" },
+            { t: "Roblox", m: "Katerin, nuestras mejores partidas son juntos. ¡Eres mi 'adopt me' favorita y mi 'bloxy' award!", img: "https://i.pinimg.com/736x/0b/0c/30/0b0c30b3e73f853a96ce437a15df83e0.jpg" },
+            { t: "Free Fire", m: "¡Katerin, eres mi dúo dinámico perfecto! Con un 'Booyah' a tu lado, no necesito nada más.", img: "https://i.pinimg.com/736x/26/bd/01/26bd01847b732ea9a975bda5a9df785d.jpg" },
+            { t: "Minecraft", m: "Katerin, eres el 'diamond' más preciado de mi mundo. ¡Eres mi 'crafting table' de sueños!", img: "https://i.pinimg.com/736x/6d/cf/b3/6dcfb3e9628c0babb57d45993667a77c.jpg" },
+            { t: "Nuestro 18", m: "Katerin, esta fecha es sagrada. Cada '18' mi corazón celebra que existes.", img: "https://i.pinimg.com/736x/65/cb/49/65cb49431fedfe8fce85265a8e3a3466.jpg" }
+        ];
+
+        const nodes = [];
+        const container = document.getElementById('labels-container');
+        const esCelularInicial = window.innerWidth < 768;
+        const radius = esCelularInicial ? 22 : 28;
+
+        info.forEach((item, i) => {
+            const div = document.createElement('div');
+            div.className = 'burbuja-imagen';
+            div.innerHTML = `<img src="${item.img}" onerror="this.src='https://via.placeholder.com/150?text=💜'">`;
+            div.onclick = (e) => { e.stopPropagation(); if (nodesEnabled) abrirModal(item.t, item.m, item.img); };
+
+            const txt = document.createElement('div');
+            txt.className = 'burbuja-texto';
+            txt.innerText = item.t;
+
+            container.appendChild(div);
+            container.appendChild(txt);
+
+            const angle = (i / info.length) * Math.PI * 2;
+
+            nodes.push({
+                el: div, tEl: txt,
+                pos: new THREE.Vector3(Math.cos(angle) * radius, 1, Math.sin(angle) * radius)
+            });
+        });
+
+        camera.position.set(0, 0, 180);
+        controls.update();
+
+        let tiempoAnimacion = 0;
+        let intervaloEfecto; 
+
+        function animate() {
+            requestAnimationFrame(animate);
+            tiempoAnimacion += 0.003;
+            tiempoEstado += 1;
+
+            const posGeo = galaxiaGeo.attributes.position.array;
+
+            if (!introSequenceActive) {
+                if (estadoIntro === "TUNEL") {
+                    for (let i = 0; i < numParticulasGalaxia; i++) {
+                        posGeo[i * 3 + 2] += 2.5;
+                        if (posGeo[i * 3 + 2] > 200) posGeo[i * 3 + 2] = -150;
+                    }
+                    galaxiaGeo.attributes.position.needsUpdate = true;
+                    camera.position.z -= 0.6;
+                    if (camera.position.z <= 60) {
+                        estadoIntro = "EXPANSION";
+                        tiempoEstado = 0;
+                    }
+                } 
+                else if (estadoIntro === "EXPANSION") {
+                    factorMezclaTunel -= 0.012;
+                    if (factorMezclaTunel < 0) factorMezclaTunel = 0;
+
+                    for (let i = 0; i < numParticulasGalaxia; i++) {
+                        const idx = i * 3;
+                        posGeo[idx] = THREE.MathUtils.lerp(posicionesFinalesGalaxia[idx], posGeo[idx], factorMezclaTunel);
+                        posGeo[idx + 1] = THREE.MathUtils.lerp(posicionesFinalesGalaxia[idx + 1], posGeo[idx + 1], factorMezclaTunel);
+                        posGeo[idx + 2] = THREE.MathUtils.lerp(posicionesFinalesGalaxia[idx + 2], posGeo[idx + 2], factorMezclaTunel);
+                    }
+                    galaxiaGeo.attributes.position.needsUpdate = true;
+
+                    camera.position.y = THREE.MathUtils.lerp(0, 32, (1 - factorMezclaTunel));
+                    camera.position.z = THREE.MathUtils.lerp(60, 55, (1 - factorMezclaTunel));
+                    camera.lookAt(0, 0, 0);
+
+                    const escNucleo = (1 - factorMezclaTunel);
+                    nucleo.scale.set(escNucleo, escNucleo, escNucleo);
+
+                    if (factorMezclaTunel === 0 && tiempoEstado > 60) {
+                        estadoIntro = "CORAZON";
+                        tiempoEstado = 0;
+                    }
+                } 
+                else if (estadoIntro === "CORAZON") {
+                    corazonMat.opacity += 0.015;
+                    if (corazonMat.opacity >= 0.9) {
+                        corazonMat.opacity = 0.9;
+                        estadoIntro = "FINAL";
+                        tiempoEstado = 0;
+                        controls.autoRotate = true;
+
+                        nodes.forEach((n, index) => {
+                            setTimeout(() => {
+                                // Solo las volvemos a encender si seguimos en la escena principal
+                                if (!introSequenceActive) {
+                                    n.el.style.opacity = "1";
+                                    n.tEl.style.opacity = "1";
+                                    n.el.style.pointerEvents = "auto";
+                                }
+                            }, index * 150);
+                        });
+                    }
+                }
+            }
+
+            if (orbitControlsEnabled) {
+                controls.update();
+            }
+
+            if (!introSequenceActive && (estadoIntro === "FINAL" || estadoIntro === "CORAZON")) {
+                galaxiaGroup.rotation.y += 0.002;
+                corazonGroup.rotation.y -= 0.004;
+
+                const escalaLatido = 1.0 + Math.sin(tiempoAnimacion * 4) * 0.04;
+                corazonGroup.scale.set(escalaLatido, escalaLatido, escalaLatido);
+            } else {
+                galaxiaGroup.rotation.y += 0.007;
+            }
+
+            const esCelular = window.innerWidth < 768;
+            nodes.forEach(n => {
+                const vector = n.pos.clone();
+                if(estadoIntro === "FINAL" && !introSequenceActive) {
+                    vector.applyAxisAngle(new THREE.Vector3(0, 1, 0), galaxiaGroup.rotation.y);
+                }
+                vector.project(camera);
+
+                const sx = (vector.x * 0.5 + 0.5) * window.innerWidth;
+                const sy = (-(vector.y * 0.5) + 0.5) * window.innerHeight;
+                const tamBase = esCelular ? 55 : 90; 
+                const scale = 1.05 - (vector.z * 0.45);
+
+                n.el.style.transform = `scale(${Math.max(0.45, scale)})`;
+                n.el.style.left = `${sx - (tamBase / 2)}px`;
+                n.el.style.top = `${sy - (tamBase / 2)}px`;
+
+                n.tEl.style.left = `${sx - 70}px`; 
+                n.tEl.style.top = esCelular ? `${sy + 28}px` : `${sy + 52}px`;
+
+                if (estadoIntro === "FINAL" && !introSequenceActive) {
+                    n.el.style.opacity = vector.z > 0.75 ? 0.85 : 1;
+                    n.tEl.style.opacity = 1;
+                }
+                n.el.style.zIndex = Math.round((1 - vector.z) * 100);
+            });
+            
+            renderer.render(scene, camera);
+        }
+
+        // --- MÁQUINA DE ESCRIBIR ---
+        function escribirDedicatoria(elemento, texto) {
+            elemento.innerHTML = ""; 
+            let i = 0;
+            clearInterval(intervaloEfecto);
+
+            intervaloEfecto = setInterval(() => {
+                if (i < texto.length) {
+                    if (texto.charAt(i) === " ") {
+                        elemento.innerHTML += "&nbsp;";
+                    } else {
+                        elemento.innerHTML += texto.charAt(i);
+                    }
+                    i++;
+                } else {
+                    clearInterval(intervaloEfecto);
+                }
+            }, 30); 
+        }
+
+        function abrirModal(titulo, texto, img) {
+            document.getElementById('modal-img').src = img;
+            document.getElementById('modal-titulo').innerText = titulo;
+            
+            document.getElementById('modal').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+            controls.autoRotate = false;
+
+            const elemTexto = document.getElementById('modal-texto');
+            escribirDedicatoria(elemTexto, texto);
+        }
+
+        function cerrarModal() {
+            clearInterval(intervaloEfecto);
+            document.getElementById('modal').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+            if(estadoIntro === "FINAL" && !introSequenceActive) controls.autoRotate = true;
+        }
+
+        function actualizarContador() {
+            const diff = new Date() - new Date('2025-11-18T00:00:00');
+            const d = Math.floor(diff / 86400000);
+            const h = Math.floor((diff / 3600000) % 24);
+            const m = Math.floor((diff / 60000) % 60);
+            const s = Math.floor((diff / 1000) % 60);
+            document.getElementById('tiempo').innerHTML = `💜 ${d}D ${h}H ${m}M ${s}S JUNTOS 💜`;
+        }
+
+        setInterval(actualizarContador, 1000);
+        actualizarContador();
+        animate();
+
+        window.onresize = () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        };
+    </script>
+</body>
+
+</html>
